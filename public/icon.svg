@@ -1,0 +1,136 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Background gradient -->
+    <radialGradient id="bgGrad" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#0e2040"/>
+      <stop offset="100%" stop-color="#050b18"/>
+    </radialGradient>
+
+    <!-- Arc gradient (icy sweep) -->
+    <linearGradient id="arcGrad" x1="80" y1="0" x2="432" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#0a3a6e" stop-opacity="0.6"/>
+      <stop offset="30%"  stop-color="#3ab4f2"/>
+      <stop offset="50%"  stop-color="#d6f0ff"/>
+      <stop offset="70%"  stop-color="#3ab4f2"/>
+      <stop offset="100%" stop-color="#0a3a6e" stop-opacity="0.6"/>
+    </linearGradient>
+
+    <!-- Arc glow (blur layer) -->
+    <filter id="arcGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Star glow -->
+    <filter id="starGlow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Snowflake glow -->
+    <filter id="snowGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Clip to rounded square -->
+    <clipPath id="roundedClip">
+      <rect width="512" height="512" rx="96" ry="96"/>
+    </clipPath>
+  </defs>
+
+  <!-- ─── Background ─── -->
+  <rect width="512" height="512" rx="96" ry="96" fill="url(#bgGrad)"/>
+
+  <!-- Subtle inner vignette -->
+  <rect width="512" height="512" rx="96" ry="96"
+        fill="none" stroke="#000" stroke-width="80" stroke-opacity="0.35"/>
+
+  <!-- ─── Stars / snow particles ─── -->
+  <g clip-path="url(#roundedClip)">
+    <!-- Large bright stars -->
+    <circle cx="256" cy="110" r="4.5" fill="#ffffff" filter="url(#starGlow)"/>
+    <circle cx="155" cy="148" r="3.5" fill="#b8e8ff" filter="url(#starGlow)"/>
+    <circle cx="357" cy="142" r="3.5" fill="#b8e8ff" filter="url(#starGlow)"/>
+    <circle cx="96"  cy="210" r="2.5" fill="#8ad4f0"  opacity="0.85"/>
+    <circle cx="418" cy="205" r="2.5" fill="#8ad4f0"  opacity="0.85"/>
+    <circle cx="195" cy="175" r="2"   fill="#ffffff"   opacity="0.7"/>
+    <circle cx="320" cy="170" r="2"   fill="#ffffff"   opacity="0.7"/>
+    <circle cx="130" cy="290" r="2"   fill="#5cbfe8"   opacity="0.55"/>
+    <circle cx="385" cy="285" r="2"   fill="#5cbfe8"   opacity="0.55"/>
+    <!-- Tiny dust -->
+    <circle cx="215" cy="130" r="1.5" fill="#ffffff"  opacity="0.5"/>
+    <circle cx="298" cy="125" r="1.5" fill="#ffffff"  opacity="0.5"/>
+    <circle cx="170" cy="230" r="1.5" fill="#8ad4f0"  opacity="0.4"/>
+    <circle cx="345" cy="225" r="1.5" fill="#8ad4f0"  opacity="0.4"/>
+    <circle cx="75"  cy="165" r="1"   fill="#ffffff"  opacity="0.4"/>
+    <circle cx="440" cy="175" r="1"   fill="#ffffff"  opacity="0.4"/>
+  </g>
+
+  <!-- ─── Snowflake (centre, subtle) ─── -->
+  <g transform="translate(256,272)" opacity="0.18" filter="url(#snowGlow)">
+    <!-- 6 main arms -->
+    <line x1="0" y1="-72" x2="0"   y2="72"  stroke="#a8dcf8" stroke-width="5" stroke-linecap="round"/>
+    <line x1="-62" y1="-36" x2="62" y2="36" stroke="#a8dcf8" stroke-width="5" stroke-linecap="round"/>
+    <line x1="62" y1="-36" x2="-62" y2="36" stroke="#a8dcf8" stroke-width="5" stroke-linecap="round"/>
+    <!-- Branch ticks on vertical arm -->
+    <line x1="-16" y1="-44" x2="0" y2="-58" stroke="#a8dcf8" stroke-width="3.5" stroke-linecap="round"/>
+    <line x1="16"  y1="-44" x2="0" y2="-58" stroke="#a8dcf8" stroke-width="3.5" stroke-linecap="round"/>
+    <line x1="-16" y1="44"  x2="0" y2="58"  stroke="#a8dcf8" stroke-width="3.5" stroke-linecap="round"/>
+    <line x1="16"  y1="44"  x2="0" y2="58"  stroke="#a8dcf8" stroke-width="3.5" stroke-linecap="round"/>
+    <!-- Branch ticks on diagonal arms -->
+    <line x1="-52" y1="-46" x2="-62" y2="-30" stroke="#a8dcf8" stroke-width="3.5" stroke-linecap="round"/>
+    <line x1="-38" y1="-56" x2="-52" y2="-44" stroke="#a8dcf8" stroke-width="3.5" stroke-linecap="round"/>
+    <line x1="52"  y1="-46" x2="62"  y2="-30" stroke="#a8dcf8" stroke-width="3.5" stroke-linecap="round"/>
+    <line x1="38"  y1="-56" x2="52"  y2="-44" stroke="#a8dcf8" stroke-width="3.5" stroke-linecap="round"/>
+    <!-- Centre hexagon -->
+    <circle cx="0" cy="0" r="10" fill="#a8dcf8"/>
+  </g>
+
+  <!-- ─── Arc glow (soft bloom layer) ─── -->
+  <path d="M 80 360 A 196 196 0 1 1 432 360"
+        fill="none"
+        stroke="#3ab4f2"
+        stroke-width="54"
+        stroke-linecap="round"
+        stroke-opacity="0.2"
+        clip-path="url(#roundedClip)"/>
+
+  <!-- ─── Main winter arc ─── -->
+  <path d="M 80 360 A 196 196 0 1 1 432 360"
+        fill="none"
+        stroke="url(#arcGrad)"
+        stroke-width="32"
+        stroke-linecap="round"
+        filter="url(#arcGlow)"
+        clip-path="url(#roundedClip)"/>
+
+  <!-- ─── Arc end-cap gleam dots ─── -->
+  <circle cx="80"  cy="360" r="8" fill="#1a6fa8" opacity="0.7"/>
+  <circle cx="432" cy="360" r="8" fill="#1a6fa8" opacity="0.7"/>
+
+  <!-- ─── Horizon ground line (subtle) ─── -->
+  <line x1="50" y1="400" x2="462" y2="400"
+        stroke="#0e3a60" stroke-width="2" stroke-opacity="0.5"
+        clip-path="url(#roundedClip)"/>
+
+  <!-- ─── Mountain silhouette ─── -->
+  <g clip-path="url(#roundedClip)" opacity="0.35">
+    <!-- Left mountain -->
+    <polygon points="60,430 170,320 280,430" fill="#0a2540"/>
+    <!-- Right mountain (taller) -->
+    <polygon points="200,430 320,285 440,430" fill="#0c2d4e"/>
+    <!-- Snow caps -->
+    <polygon points="170,320 155,345 185,345" fill="#c8eaff" opacity="0.6"/>
+    <polygon points="320,285 300,318 340,318" fill="#d6f0ff" opacity="0.6"/>
+  </g>
+</svg>
