@@ -10,21 +10,21 @@
 
 ### Starting Values (Day 1)
 
-| Exercise  | Amount     |
-|-----------|------------|
-| Push-ups  | 1 rep      |
-| Sit-ups   | 1 rep      |
-| Plank     | 30 seconds |
+| Exercise | Amount     |
+| -------- | ---------- |
+| Push-ups | 1 rep      |
+| Sit-ups  | 1 rep      |
+| Plank    | 30 seconds |
 
 ### Daily Progression
 
 Each day the targets increase by:
 
-| Exercise  | Daily Increase |
-|-----------|----------------|
-| Push-ups  | +1 rep         |
-| Sit-ups   | +1 rep         |
-| Plank     | +5 seconds     |
+| Exercise | Daily Increase |
+| -------- | -------------- |
+| Push-ups | +1 rep         |
+| Sit-ups  | +1 rep         |
+| Plank    | +5 seconds     |
 
 ### Formula
 
@@ -64,14 +64,14 @@ If the user misses more than 1 day, or opens the app after a single missed day a
 
 Displayed on a dedicated "Shame Screen" when the streak is officially broken:
 
-1. *"You had ONE job. ONE. And you blew it. Welcome back to Day 1, quitter."*
-2. *"Wow. Even your streak couldn't stand you. Starting over like the amateur you are."*
-3. *"Classic. The arc waits for no one — especially not you. Day 1. Again."*
-4. *"Your future self is embarrassed. Day 1. Try not to mess it up this time."*
-5. *"The cold doesn't take days off. Unfortunately, you do. Back to the beginning."*
-6. *"A whole streak, wasted. Absolutely shameful. Day 1 is calling your name."*
-7. *"Did life get 'too busy'? The push-up doesn't care. Neither does this app. Reset."*
-8. *"You broke the arc. The arc is disappointed. Back to square one, champ."*
+1. _"You had ONE job. ONE. And you blew it. Welcome back to Day 1, quitter."_
+2. _"Wow. Even your streak couldn't stand you. Starting over like the amateur you are."_
+3. _"Classic. The arc waits for no one — especially not you. Day 1. Again."_
+4. _"Your future self is embarrassed. Day 1. Try not to mess it up this time."_
+5. _"The cold doesn't take days off. Unfortunately, you do. Back to the beginning."_
+6. _"A whole streak, wasted. Absolutely shameful. Day 1 is calling your name."_
+7. _"Did life get 'too busy'? The push-up doesn't care. Neither does this app. Reset."_
+8. _"You broke the arc. The arc is disappointed. Back to square one, champ."_
 
 A "Continue" button dismisses the Shame Screen and loads the Day 1 workout.
 
@@ -79,42 +79,65 @@ A "Continue" button dismisses the Shame Screen and loads the Day 1 workout.
 
 ## App Screens & Flow
 
-### 1. Home / Today's Workout Screen
+### 1. Home / Day View (primary screen)
 
 - Displayed on app open
-- Shows the **current day number** (e.g. "Day 7")
-- Displays today's targets clearly:
-  - Push-ups: X reps
-  - Sit-ups: X reps
-  - Plank: X seconds
-- A prominent **"Done for Today"** button to log completion
-- If today's workout has already been completed, the button is disabled/hidden and a "Already crushed it today" message is shown instead
+- Has day navigation controls to move between dates (past and today only)
+- Shows all activities due for the selected date as **interactive activity buttons/cards**
+- Each activity card contains:
+  - activity name
+  - target value + unit (e.g., `12 reps`, `30 sec`, `5 km`)
+  - completion state (`pending`, `in-progress` for timer, `done`)
+- Activity completion is saved immediately per activity/date in IndexedDB
 
-### 1b. Streak Freeze Screen (shown when app is opened after exactly 1 missed day)
+### 1a. Plank / Timer Activity Behavior
 
-- Displayed instead of the normal Home screen
-- Informs the user they missed yesterday
-- Shows the **combined targets** for both yesterday and today
-- Shows a **"Make It Right"** button — completing this logs both days and preserves the streak
-- Shows a secondary **"I Give Up — Reset"** button that triggers the Shame Screen and resets to Day 1
+- Clicking a timer-type activity (for now plank) starts a countdown
+- Timer auto-completes activity at `00:00`
+- While active, card shows running state and remaining time
+- Prevent duplicate starts while timer is already running
 
-### 2. Completion Screen (shown after pressing "Done for Today" or "Make It Right")
+### 1b. Daily Completion Behavior
 
-- Congratulates the user
-- If a Streak Freeze was just used, adds a special callout: *"Streak saved — don't let it happen again."*
+- There is no single mandatory "Done for Today" action for progress safety
+- A date is considered completed when **all due activities for that date** are completed
+- If user forgot to confirm earlier, they can navigate back to that date and complete the missing activities
+
+### 2. Freeze Screen (shown when exactly one missed due date is detected)
+
+- Informs user a streak break is pending
+- Shows a **Use Freeze** path if user owns a freeze
+- Shows a **Backfill Missed Date** path so user can complete missing due activities and preserve streak
+- Shows a secondary reset path that triggers Shame Screen
+
+### 3. Completion Screen
+
+- Congratulates user for completing the selected date
 - Displays:
-  - **Current streak** — consecutive days completed without missing a day
-  - **Total workouts completed**
-  - **Lifetime totals** — total push-ups, sit-ups, and plank time accumulated
-  - **Personal bests** — highest single-day reps/plank time reached
-- A button to return to the Home screen
+  - **Current streak**
+  - **Best streak**
+  - **Freeze inventory** (`0` or `1`)
+  - **Total completed dates/workouts**
+  - **Lifetime totals** for tracked activities
 
-### 3. Shame Screen (shown when streak is broken with no freeze)
+### 4. Activity Settings Screen
+
+- Manage custom activities (add, edit, archive)
+- Each activity has:
+  - `name`
+  - `startValue`
+  - `increase`
+  - `period`
+  - `periodUnit` (`day` or `week`)
+  - `unitLabel` (e.g., reps, sec, km)
+  - `effectiveStartDate`
+
+### 5. Shame Screen (shown when streak is broken with no freeze/backfill)
 
 - Full-screen dark overlay with red tint
 - Displays one of the bully messages (randomly selected)
-- Shows the user's now-dead streak number: *"You had a X-day streak. Had."*
-- A "Continue" button that loads the Day 1 workout
+- Shows the user's now-dead streak number: _"You had a X-day streak. Had."_
+- A "Continue" button that starts the new streak cycle
 
 ---
 
@@ -126,35 +149,66 @@ All data is stored locally using the browser's **IndexedDB** API. No backend or 
 
 Each completed workout session is stored as a record:
 
-| Field        | Type     | Description                          |
-|--------------|----------|--------------------------------------|
-| `date`       | string   | ISO date string (e.g. `"2026-03-09"`) — used as primary key |
-| `day`        | number   | Program day number (1, 2, 3, …)      |
-| `pushups`    | number   | Number of push-ups completed         |
-| `situps`     | number   | Number of sit-ups completed          |
-| `plankSecs`  | number   | Plank duration in seconds            |
-| `completedAt`| string   | ISO timestamp of completion          |
+| Field         | Type   | Description                                                 |
+| ------------- | ------ | ----------------------------------------------------------- |
+| `date`        | string | ISO date string (e.g. `"2026-03-09"`) — used as primary key |
+| `day`         | number | Program day number (1, 2, 3, …)                             |
+| `pushups`     | number | Number of push-ups completed                                |
+| `situps`      | number | Number of sit-ups completed                                 |
+| `plankSecs`   | number | Plank duration in seconds                                   |
+| `completedAt` | string | ISO timestamp of completion                                 |
 
 ### Object Store: `streaks`
 
 Tracks the current active streak session:
 
-| Field           | Type     | Description                                       |
-|-----------------|----------|---------------------------------------------------|
-| `id`            | number   | Always `1` — single record                       |
-| `startDate`     | string   | ISO date when current streak began               |
-| `currentStreak` | number   | Number of days in the current active streak      |
-| `bestStreak`    | number   | Highest streak ever reached                      |
-| `freezesUsed`   | number   | Total number of streak freezes ever used         |
+| Field             | Type   | Description                                 |
+| ----------------- | ------ | ------------------------------------------- |
+| `id`              | number | Always `1` — single record                  |
+| `startDate`       | string | ISO date when current streak began          |
+| `currentStreak`   | number | Number of days in the current active streak |
+| `bestStreak`      | number | Highest streak ever reached                 |
+| `freezesUsed`     | number | Total number of streak freezes ever used    |
+| `freezeInventory` | number | Current available freezes (`0` or `1`)      |
+
+### Object Store: `activities`
+
+Stores activity schedule definitions:
+
+| Field                | Type    | Description                                           |
+| -------------------- | ------- | ----------------------------------------------------- |
+| `id`                 | string  | Unique activity ID                                    |
+| `name`               | string  | Display name                                          |
+| `startValue`         | number  | Base target value                                     |
+| `increase`           | number  | Increment each period (`0` means constant)            |
+| `period`             | number  | Period amount (e.g. `1`, `2`)                         |
+| `periodUnit`         | string  | `day` or `week`                                       |
+| `unitLabel`          | string  | Unit display (`reps`, `sec`, `km`, etc.)              |
+| `effectiveStartDate` | string  | Date this activity starts affecting target generation |
+| `archivedAt`         | string? | Optional archive date (null when active)              |
+
+### Object Store: `activityCompletions`
+
+Per-date activity completion records:
+
+| Field         | Type    | Description                            |
+| ------------- | ------- | -------------------------------------- |
+| `id`          | string  | Composite key: `${date}:${activityId}` |
+| `date`        | string  | ISO date                               |
+| `activityId`  | string  | Linked activity ID                     |
+| `targetValue` | number  | Computed target value for that date    |
+| `completed`   | boolean | Completion state                       |
+| `completedAt` | string? | Completion timestamp                   |
 
 ### Derived Statistics (computed from stored records)
 
 - **Current streak**: from the `streaks` store `currentStreak` field
-- **Total workouts**: total number of records in the `workouts` store
-- **Lifetime push-ups / sit-ups / plank seconds**: sum of all records across all sessions
+- **Total completed dates**: number of dates where all due activities are completed
+- **Lifetime totals**: aggregate by activity and unit from `activityCompletions`
 - **Best streak**: `bestStreak` from the `streaks` store
-- **Best day**: the record with the highest `day` value
-- **Missed day detection**: on app open, compare last workout date to today — if gap === 1 day → offer Streak Freeze screen; if gap > 1 day → Shame Screen + reset to Day 1
+- **Freeze inventory**: `freezeInventory` (`max = 1`)
+- **Missed date detection**: evaluate due activities by date; if any due activity missing on a past due date, streak is at risk
+- **Global streak rule**: streak is global. If one due activity fails for a date, streak fails for that date
 
 ---
 
@@ -165,6 +219,20 @@ Tracks the current active streak session:
 - Installable on Android, iOS, and desktop Chrome/Edge
 - App icon: custom SVG (source at `public/icon.svg`) + PNG exports at 192×192 and 512×512
 - Icon design: deep navy rounded-square background, bold icy arc gradient (dark blue → ice blue → white → ice blue → dark blue), snowflake motif center, star/snow particle accents
+
+### Notifications & Badge
+
+- The app must request notification permission from the user
+- The app must support **both badge and push/local notifications**
+- Daily reminder time is fixed to **20:00 local device time**
+- Reminder content example: "Winter Arc check-in. Complete today's activities."
+- Badge behavior:
+  - Set app badge when today's due activities are still incomplete after reminder time
+  - Clear badge once all today's due activities are completed
+- If platform supports reliable background scheduling, notification is delivered at 20:00
+- If platform does not support reliable background scheduling while app is closed, fallback is:
+  - show reminder immediately on next app open after 20:00
+  - keep badge state accurate regardless
 
 ---
 
@@ -184,17 +252,16 @@ Tracks the current active streak session:
 - User accounts or cloud sync
 - Multiple users on the same device
 - Rest day scheduling
-- Push notifications (may be added in v2)
 - Custom exercise targets
 
 ---
 
 ## Tech Stack
 
-| Concern         | Choice                     |
-|-----------------|----------------------------|
-| Framework       | React + Vite               |
-| Styling         | CSS Modules or Tailwind    |
-| Storage         | IndexedDB (via `idb` lib)  |
-| PWA             | Vite PWA plugin (`vite-plugin-pwa`) |
-| Deployment      | GitHub Pages               |
+| Concern    | Choice                              |
+| ---------- | ----------------------------------- |
+| Framework  | React + Vite                        |
+| Styling    | CSS Modules or Tailwind             |
+| Storage    | IndexedDB (via `idb` lib)           |
+| PWA        | Vite PWA plugin (`vite-plugin-pwa`) |
+| Deployment | GitHub Pages                        |

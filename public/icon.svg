@@ -5,7 +5,6 @@
       <stop offset="0%" stop-color="#0e2040"/>
       <stop offset="100%" stop-color="#050b18"/>
     </radialGradient>
-
     <!-- Arc gradient (icy sweep) -->
     <linearGradient id="arcGrad" x1="80" y1="0" x2="432" y2="0" gradientUnits="userSpaceOnUse">
       <stop offset="0%"   stop-color="#0a3a6e" stop-opacity="0.6"/>
@@ -14,7 +13,6 @@
       <stop offset="70%"  stop-color="#3ab4f2"/>
       <stop offset="100%" stop-color="#0a3a6e" stop-opacity="0.6"/>
     </linearGradient>
-
     <!-- Arc glow (blur layer) -->
     <filter id="arcGlow" x="-30%" y="-30%" width="160%" height="160%">
       <feGaussianBlur stdDeviation="10" result="blur"/>
@@ -23,7 +21,6 @@
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
-
     <!-- Star glow -->
     <filter id="starGlow" x="-100%" y="-100%" width="300%" height="300%">
       <feGaussianBlur stdDeviation="3" result="blur"/>
@@ -32,7 +29,6 @@
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
-
     <!-- Snowflake glow -->
     <filter id="snowGlow" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="5" result="blur"/>
@@ -41,20 +37,16 @@
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
-
     <!-- Clip to rounded square -->
     <clipPath id="roundedClip">
       <rect width="512" height="512" rx="96" ry="96"/>
     </clipPath>
   </defs>
-
   <!-- ─── Background ─── -->
   <rect width="512" height="512" rx="96" ry="96" fill="url(#bgGrad)"/>
-
   <!-- Subtle inner vignette -->
   <rect width="512" height="512" rx="96" ry="96"
         fill="none" stroke="#000" stroke-width="80" stroke-opacity="0.35"/>
-
   <!-- ─── Stars / snow particles ─── -->
   <g clip-path="url(#roundedClip)">
     <!-- Large bright stars -->
@@ -75,7 +67,6 @@
     <circle cx="75"  cy="165" r="1"   fill="#ffffff"  opacity="0.4"/>
     <circle cx="440" cy="175" r="1"   fill="#ffffff"  opacity="0.4"/>
   </g>
-
   <!-- ─── Snowflake (centre, subtle) ─── -->
   <g transform="translate(256,272)" opacity="0.18" filter="url(#snowGlow)">
     <!-- 6 main arms -->
@@ -95,7 +86,6 @@
     <!-- Centre hexagon -->
     <circle cx="0" cy="0" r="10" fill="#a8dcf8"/>
   </g>
-
   <!-- ─── Arc glow (soft bloom layer) ─── -->
   <path d="M 80 360 A 196 196 0 1 1 432 360"
         fill="none"
@@ -104,7 +94,6 @@
         stroke-linecap="round"
         stroke-opacity="0.2"
         clip-path="url(#roundedClip)"/>
-
   <!-- ─── Main winter arc ─── -->
   <path d="M 80 360 A 196 196 0 1 1 432 360"
         fill="none"
@@ -113,16 +102,13 @@
         stroke-linecap="round"
         filter="url(#arcGlow)"
         clip-path="url(#roundedClip)"/>
-
   <!-- ─── Arc end-cap gleam dots ─── -->
   <circle cx="80"  cy="360" r="8" fill="#1a6fa8" opacity="0.7"/>
   <circle cx="432" cy="360" r="8" fill="#1a6fa8" opacity="0.7"/>
-
   <!-- ─── Horizon ground line (subtle) ─── -->
   <line x1="50" y1="400" x2="462" y2="400"
         stroke="#0e3a60" stroke-width="2" stroke-opacity="0.5"
         clip-path="url(#roundedClip)"/>
-
   <!-- ─── Mountain silhouette ─── -->
   <g clip-path="url(#roundedClip)" opacity="0.35">
     <!-- Left mountain -->

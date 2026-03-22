@@ -1,64 +1,70 @@
-import { getTargets, formatPlank } from '../workout.js'
-
-function ExerciseCard({ emoji, value, unit, label }) {
-  return (
-    <div className="exercise-card">
-      <span className="exercise-emoji">{emoji}</span>
-      <span className="exercise-value">{value}</span>
-      {unit && <span className="exercise-unit">{unit}</span>}
-      <span className="exercise-label">{label}</span>
-    </div>
-  )
-}
-
-export default function FreezeScreen({ yesterdayDay, todayDay, onMakeItRight, onGiveUp }) {
-  const y = getTargets(yesterdayDay)
-  const t = getTargets(todayDay)
-  const combined = {
-    pushups: y.pushups + t.pushups,
-    situps: y.situps + t.situps,
-    plankSecs: y.plankSecs + t.plankSecs,
-  }
+export default function FreezeScreen({
+  missedDate,
+  freezeInventory,
+  onUseFreeze,
+  onBackfill,
+  onGiveUp,
+}) {
+  const formattedDate = new Intl.DateTimeFormat(undefined, {
+    weekday: "long",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(new Date(`${missedDate}T12:00:00`));
 
   return (
-    <div className="screen freeze-screen">
-      <div className="warning-icon">⚠️</div>
-
-      <div style={{ textAlign: 'center' }}>
-        <div className="freeze-title">You Missed Yesterday</div>
-        <p className="freeze-subtitle" style={{ marginTop: 6 }}>
-          One chance to save your streak. Do both days now.
-        </p>
-      </div>
-
-      <div className="freeze-breakdown">
-        <div className="freeze-day-row">
-          <span className="freeze-day-label">Yesterday — Day {yesterdayDay}</span>
-          <span className="freeze-day-targets">
-            {y.pushups} push-ups · {y.situps} sit-ups · {formatPlank(y.plankSecs)} plank
-          </span>
+    <div className="screen freeze-screen freeze-screen-shell">
+      <div className="freeze-hero">
+        <div className="warning-icon">⚠️</div>
+        <div className="completion-header">
+          <div className="freeze-title">Missed Date Detected</div>
+          <p className="freeze-subtitle">
+            You missed due activities on {formattedDate}. Recover the streak by backfilling the date or spend your freeze.
+          </p>
         </div>
-        <div className="freeze-divider">+</div>
-        <div className="freeze-day-row">
-          <span className="freeze-day-label">Today — Day {todayDay}</span>
-          <span className="freeze-day-targets">
-            {t.pushups} push-ups · {t.situps} sit-ups · {formatPlank(t.plankSecs)} plank
-          </span>
+
+        <div className="hero-stats freeze-summary-grid">
+          <div className="hero-stat-pill freeze-pill">
+            <span className="hero-stat-label">Date</span>
+            <span className="hero-stat-value freeze-stat-value">{missedDate}</span>
+          </div>
+          <div className="hero-stat-pill freeze-pill">
+            <span className="hero-stat-label">Freeze</span>
+            <span className="hero-stat-value">{freezeInventory}/1</span>
+          </div>
         </div>
       </div>
 
-      <div className="exercise-grid">
-        <ExerciseCard emoji="💪" value={combined.pushups} unit="reps" label="Push-ups" />
-        <ExerciseCard emoji="🔥" value={combined.situps} unit="reps" label="Sit-ups" />
-        <ExerciseCard emoji="⏱" value={formatPlank(combined.plankSecs)} label="Plank" />
+      <div className="freeze-breakdown freeze-breakdown-card">
+        <div className="freeze-day-row">
+          <span className="freeze-day-label">Freeze Inventory</span>
+          <span className="freeze-day-targets">{freezeInventory}/1 available</span>
+        </div>
+        <div className="freeze-day-row">
+          <span className="freeze-day-label">Recommendation</span>
+          <span className="freeze-day-targets">
+            Backfill first to keep real completion history.
+          </span>
+        </div>
       </div>
 
-      <button className="btn-primary btn-amber" onClick={onMakeItRight}>
-        Make It Right
-      </button>
-      <button className="btn-ghost" onClick={onGiveUp}>
-        I Give Up — Reset
-      </button>
+      <div className="freeze-actions">
+        <button className="btn-secondary" onClick={onBackfill}>
+          Backfill Missed Date
+        </button>
+
+        <button
+          className="btn-primary btn-amber"
+          onClick={onUseFreeze}
+          disabled={freezeInventory <= 0}
+        >
+          Use Freeze
+        </button>
+
+        <button className="btn-ghost freeze-reset-btn" onClick={onGiveUp}>
+          I Give Up — Reset
+        </button>
+      </div>
     </div>
-  )
+  );
 }

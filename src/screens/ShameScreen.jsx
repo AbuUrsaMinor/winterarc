@@ -1,19 +1,23 @@
 export default function ShameScreen({ message, deadStreak, onContinue }) {
   return (
-    <div className="screen shame-screen">
-      <div className="shame-icon">💀</div>
+    <div className="screen shame-screen shame-screen-shell">
+      <div className="shame-hero">
+        <div className="shame-icon">💀</div>
+        <div className="completion-header">
+          <div className="completion-title shame-title">Streak Broken</div>
+          {deadStreak > 0 && (
+            <p className="dead-streak">
+              You had a <strong>{deadStreak}-day streak</strong>. Had.
+            </p>
+          )}
+        </div>
+      </div>
 
-      {deadStreak > 0 && (
-        <p className="dead-streak">
-          You had a <strong>{deadStreak}-day streak</strong>. Had.
-        </p>
-      )}
-
-      <blockquote className="bully-message">&ldquo;{message}&rdquo;</blockquote>
+      <blockquote className="bully-message shame-message-card">&ldquo;{message}&rdquo;</blockquote>
 
       <button className="btn-primary btn-shame" onClick={onContinue}>
-        Fine. Day 1. Let&apos;s go.
+        Reset to Day 1
       </button>
     </div>
-  )
+  );
 }
