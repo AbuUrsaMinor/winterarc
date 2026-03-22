@@ -180,7 +180,7 @@ export default function HomeScreen({
           Progress
         </button>
         <button className="btn-secondary btn-utility" onClick={onOpenSettings}>
-          Activities
+          Settings
         </button>
       </div>
     </div>

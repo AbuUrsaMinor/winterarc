@@ -50,6 +50,10 @@ function maxDate(...dates) {
   return validDates[validDates.length - 1] || null;
 }
 
+function formatReminderHour(hour) {
+  return `${String(hour).padStart(2, "0")}:00`;
+}
+
 export default function App() {
   const [screen, setScreen] = useState("loading");
   const [activities, setActivities] = useState([]);
@@ -63,6 +67,10 @@ export default function App() {
   const [freezeUsed, setFreezeUsed] = useState(false);
   const [timerState, setTimerState] = useState(null);
   const [timerRemaining, setTimerRemaining] = useState(0);
+  const [notificationSettings, setNotificationSettings] = useState({
+    reminderHour: 20,
+    lastNotifiedDate: null,
+  });
   const [notificationPermission, setNotificationPermission] = useState(
     typeof Notification === "undefined" ? "unsupported" : Notification.permission
   );
@@ -133,12 +141,13 @@ export default function App() {
       dueToday,
       currentCompletionsByDate[currentDate] || {}
     );
+    const shouldShowBadge = dueToday.length > 0 && !completeToday;
 
-    if (navigator.setAppBadge && hour >= settings.reminderHour && !completeToday) {
+    if (navigator.setAppBadge && shouldShowBadge) {
       await navigator.setAppBadge(1);
     }
 
-    if (navigator.clearAppBadge && completeToday) {
+    if (navigator.clearAppBadge && !shouldShowBadge) {
       await navigator.clearAppBadge();
     }
 
@@ -150,11 +159,12 @@ export default function App() {
 
     if (shouldNotify) {
       new Notification("Winter Arc check-in", {
-        body: "It is 20:00. Complete your due activities for today.",
+        body: `It is ${formatReminderHour(settings.reminderHour)}. Complete your due activities for today.`,
         icon: `${import.meta.env.BASE_URL}icon-192.png`,
         badge: `${import.meta.env.BASE_URL}icon-192.png`,
       });
       await saveNotificationSettings({ ...settings, lastNotifiedDate: currentDate });
+      setNotificationSettings({ ...settings, lastNotifiedDate: currentDate });
     }
 
     if (
@@ -163,16 +173,19 @@ export default function App() {
       minute < 1 &&
       settings.lastNotifiedDate !== currentDate
     ) {
-      await saveNotificationSettings({ ...settings, lastNotifiedDate: currentDate });
+      const nextSettings = { ...settings, lastNotifiedDate: currentDate };
+      await saveNotificationSettings(nextSettings);
+      setNotificationSettings(nextSettings);
     }
   }
 
   async function refreshState({ preferredDate = selectedDate, initial = false } = {}) {
-    const [loadedActivities, allCompletions, streak, loadedAppMeta] = await Promise.all([
+    const [loadedActivities, allCompletions, streak, loadedAppMeta, loadedNotificationSettings] = await Promise.all([
       getActivities(),
       getAllCompletions(),
       getStreakData(),
       getAppMeta(),
+      getNotificationSettings(),
     ]);
 
     const byDate = mapCompletionsByDate(allCompletions);
@@ -212,6 +225,7 @@ export default function App() {
     setAppMeta(loadedAppMeta);
     setCompletionsByDate(byDate);
     setStreakData(nextStreak);
+    setNotificationSettings(loadedNotificationSettings);
 
     const clampedDate = preferredDate > today ? today : preferredDate;
     setSelectedDate(clampedDate);
@@ -427,6 +441,16 @@ export default function App() {
     await refreshState({ preferredDate: selectedDate });
   }
 
+  async function handleReminderHourChange(reminderHour) {
+    const nextSettings = {
+      ...notificationSettings,
+      reminderHour,
+    };
+    await saveNotificationSettings(nextSettings);
+    setNotificationSettings(nextSettings);
+    await updateNotificationsState(activities, completionsByDate);
+  }
+
   function handlePrevDate() {
     setSelectedDate(addDays(selectedDate, -1));
   }
@@ -507,6 +531,10 @@ export default function App() {
       <ActivitySettingsScreen
         activities={activities}
         selectedDate={selectedDate}
+        notificationSettings={notificationSettings}
+        notificationPermission={notificationPermission}
+        onEnableNotifications={handleEnableNotifications}
+        onReminderHourChange={handleReminderHourChange}
         onSave={handleSaveActivity}
         onArchive={handleArchiveActivity}
         onBack={() => setScreen("home")}

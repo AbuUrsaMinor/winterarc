@@ -20,15 +20,57 @@ function formatDisplayDate(selectedDate) {
   }).format(date);
 }
 
+function formatReminderHour(hour) {
+  return `${String(hour).padStart(2, "0")}:00`;
+}
+
+function getPermissionMeta(permission) {
+  if (permission === "granted") {
+    return {
+      label: "Enabled",
+      detail: "Browser reminders can fire at the selected hour.",
+      action: null,
+    };
+  }
+
+  if (permission === "denied") {
+    return {
+      label: "Blocked",
+      detail: "Notifications are blocked in the browser. Re-enable them in site settings.",
+      action: null,
+    };
+  }
+
+  if (permission === "unsupported") {
+    return {
+      label: "Unsupported",
+      detail: "This browser does not expose the Notification API.",
+      action: null,
+    };
+  }
+
+  return {
+    label: "Off",
+    detail: "Grant permission to enable daily reminder popups.",
+    action: "Enable notifications",
+  };
+}
+
 export default function ActivitySettingsScreen({
   activities,
   selectedDate,
+  notificationSettings,
+  notificationPermission,
+  onEnableNotifications,
+  onReminderHourChange,
   onSave,
   onArchive,
   onBack,
 }) {
   const [form, setForm] = useState(emptyForm);
   const formattedDate = formatDisplayDate(selectedDate);
+  const permissionMeta = getPermissionMeta(notificationPermission);
+  const reminderHour = notificationSettings?.reminderHour ?? 20;
 
   const activeActivities = useMemo(
     () => activities.filter((a) => !a.archivedAt || a.archivedAt >= selectedDate),
@@ -72,11 +114,62 @@ export default function ActivitySettingsScreen({
       <div className="home-hero settings-hero">
         <div className="completion-header settings-header">
           <div className="completion-emoji">⚙️</div>
-          <div className="completion-title">Activities</div>
+          <div className="completion-title">Settings</div>
           <div className="mini-meta">Changes take effect from {formattedDate}</div>
         </div>
         <div className="hero-status">
-          Add new training blocks or archive ones you no longer want due.
+          Control reminders, keep the app badge persistent until you finish the day, and manage your training blocks.
+        </div>
+      </div>
+
+      <div className="settings-section-card">
+        <div className="section-heading">Notifications</div>
+        <div className="settings-stack">
+          <div className="settings-card settings-card-main settings-card-gap">
+            <div className="settings-card-title-row">
+              <span className="settings-emoji">🔔</span>
+              <strong>Reminder status</strong>
+            </div>
+            <div className="settings-inline-row">
+              <span className="settings-status-pill">{permissionMeta.label}</span>
+              <span className="freeze-day-targets">{permissionMeta.detail}</span>
+            </div>
+            {permissionMeta.action && (
+              <button className="btn-secondary settings-inline-button" onClick={onEnableNotifications}>
+                {permissionMeta.action}
+              </button>
+            )}
+          </div>
+
+          <div className="settings-card settings-card-main settings-card-gap">
+            <div className="settings-card-title-row">
+              <span className="settings-emoji">🕗</span>
+              <strong>Reminder time</strong>
+            </div>
+            <div className="freeze-day-targets">
+              Daily check-in is set to {formatReminderHour(reminderHour)}.
+            </div>
+            <select
+              value={String(reminderHour)}
+              onChange={(e) => onReminderHourChange(Number(e.target.value))}
+            >
+              {Array.from({ length: 24 }, (_, hour) => (
+                <option key={hour} value={hour}>
+                  {formatReminderHour(hour)}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="settings-card settings-card-main settings-card-gap">
+            <div className="settings-card-title-row">
+              <span className="settings-emoji">📛</span>
+              <strong>App badge</strong>
+            </div>
+            <div className="freeze-day-targets">
+              The app icon warning reappears each day whenever due activities are still incomplete, and clears as soon as you finish that day.
+            </div>
+          </div>
         </div>
       </div>
 
